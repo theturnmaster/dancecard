@@ -43,3 +43,14 @@ export async function deleteTeacherSlot(slotId: string, teacherId: string) {
   });
   revalidatePath('/teacher/schedule');
 }
+
+export async function updateTeacherSlot(slotId: string, teacherId: string, startTime: Date, endTime: Date) {
+  const slot = await prisma.timeSlot.findUnique({ where: { id: slotId }});
+  if (slot?.teacherId === teacherId) {
+    await prisma.timeSlot.update({
+      where: { id: slotId },
+      data: { startTime, endTime }
+    });
+    revalidatePath('/teacher/schedule');
+  }
+}

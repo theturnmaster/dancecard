@@ -56,6 +56,14 @@ export async function createTimeSlot(roomId: string, teacherId: string, startTim
   revalidatePath('/admin/schedule');
 }
 
+export async function updateTimeSlot(slotId: string, startTime: Date, endTime: Date) {
+  await prisma.timeSlot.update({
+    where: { id: slotId },
+    data: { startTime, endTime }
+  });
+  revalidatePath('/admin/schedule');
+}
+
 export async function getEnrollmentStatus() {
   const period = await prisma.enrollmentPeriod.findFirst({
     orderBy: { startTime: 'desc' }
