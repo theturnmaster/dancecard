@@ -1,8 +1,10 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { getTeacherSlots, createTeacherSlot, deleteTeacherSlot, updateTeacherSlot } from "@/actions/teacher";
-import { getRooms } from "@/actions/admin";
+import { getRooms, getEnrollmentPeriods } from "@/actions/admin";
 import TeacherScheduleClient from './TeacherScheduleClient';
+
+export const dynamic = 'force-dynamic';
 
 export default async function TeacherSchedulePage() {
   const session = await getServerSession(authOptions);
@@ -13,17 +15,21 @@ export default async function TeacherSchedulePage() {
 
   const teacherId = (session.user as any).id;
 
-  const [slots, rooms] = await Promise.all([
+  const [slots, rooms, periods] = await Promise.all([
     getTeacherSlots(teacherId),
-    getRooms()
+    getRooms(),
+    getEnrollmentPeriods()
   ]);
 
   return (
     <div>
-      <h1 className="text-4xl font-extrabold text-indigo-900 mb-6">My Schedule</h1>
-      <p className="text-slate-600 text-lg mb-8">Manage your availability and drag to create timeslots interactively.</p>
+      <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-amber-400 to-amber-500 mb-2">
+        My Schedule
+      </h1>
+      <p className="text-zinc-400 text-lg mb-8 font-medium">Select an enrollment period to view and manage your availability schedule.</p>
       
       <TeacherScheduleClient 
+        periods={periods}
         rooms={rooms}
         slots={slots}
         onAddSlot={createTeacherSlot.bind(null, teacherId)}

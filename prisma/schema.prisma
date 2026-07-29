@@ -20,6 +20,7 @@ model User {
   passwordHash   String
   resetToken     String?
   role           Role      @default(PARENT)
+  isApproved     Boolean   @default(true)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -64,10 +65,15 @@ model TimeSlot {
 }
 
 model EnrollmentPeriod {
-  id        String   @id @default(cuid())
-  startTime DateTime
-  endTime   DateTime
-  isOpen    Boolean  @default(false)
+  id              String   @id @default(cuid())
+  name            String
+  enrollmentStart DateTime
+  enrollmentEnd   DateTime
+  lessonStart     DateTime
+  lessonEnd       DateTime
+  isOpen          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model InterestRegistration {

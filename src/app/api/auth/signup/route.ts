@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
@@ -30,13 +28,16 @@ export async function POST(req: Request) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the user
+    const userRole = role || "PARENT";
+
+    // Create the user with isApproved: false for PARENT accounts so they require Admin approval!
     const user = await prisma.user.create({
       data: {
         name,
         email,
         passwordHash: hashedPassword,
-        role: role || "PARENT", // Default to parent if not provided, though admin should really be the only one making teachers
+        role: userRole,
+        isApproved: userRole === "PARENT" ? false : true,
       },
     });
 

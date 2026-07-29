@@ -1,10 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -50,7 +48,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-        };
+          isApproved: user.isApproved ?? true,
+        } as any;
       },
     }),
   ],
@@ -59,13 +58,24 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        (session.user as any).isApproved = token.isApproved ?? true;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        token.role = (user as any).role;
+        token.isApproved = (user as any).isApproved ?? true;
+      } else if (token.id) {
+        // Refresh isApproved from database to handle real-time admin approvals!
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { isApproved: true }
+        });
+        if (dbUser) {
+          token.isApproved = dbUser.isApproved;
+        }
       }
       return token;
     },

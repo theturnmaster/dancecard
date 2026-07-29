@@ -1,9 +1,7 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-
-const prisma = new PrismaClient();
 
 export async function getMyDancers(parentId: string) {
   return await prisma.dancer.findMany({
@@ -64,7 +62,13 @@ export async function removeInterest(dancerId: string, timeSlotId: string) {
 
 export async function getAvailableSlots() {
   return await prisma.timeSlot.findMany({
-    include: { room: true, teacher: true },
+    include: { 
+      room: true, 
+      teacher: true,
+      assignment: {
+        include: { dancer: true }
+      }
+    },
     orderBy: { startTime: 'asc' }
   });
 }

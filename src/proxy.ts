@@ -10,6 +10,9 @@ export async function proxy(req: NextRequest) {
 
   if (isAuthPage) {
     if (token) {
+      if ((token as any).role === 'PARENT' && (token as any).isApproved === false) {
+        return NextResponse.redirect(new URL('/parent/pending', req.url));
+      }
       return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
     }
     return NextResponse.next();
@@ -17,6 +20,19 @@ export async function proxy(req: NextRequest) {
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // Handle Unapproved / Probationary Parent Accounts
+  if ((token as any).role === 'PARENT' && (token as any).isApproved === false) {
+    if (pathname !== '/parent/pending') {
+      return NextResponse.redirect(new URL('/parent/pending', req.url));
+    }
+    return NextResponse.next();
+  }
+
+  // If approved parent tries to visit /parent/pending, redirect to /parent
+  if (pathname === '/parent/pending' && (token as any).isApproved !== false) {
+    return NextResponse.redirect(new URL('/parent', req.url));
   }
 
   // Role-based routing protection
@@ -29,7 +45,6 @@ export async function proxy(req: NextRequest) {
   }
   
   if (pathname.startsWith('/parent') && (token as any).role !== 'PARENT') {
-    // Admins might want to test parent view, but strictly adhering to roles:
     return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
   }
 
@@ -37,5 +52,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/teacher/:path*', '/parent/:path*', '/login', '/signup', '/forgot-password'],
+  matcher: ['/admin/:path*', '/teacher/:path*', '/parent/:path*', '/parent/pending', '/login', '/signup', '/forgot-password'],
 };
