@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
 
   if (isAuthPage) {
     if (token) {
-      return NextResponse.redirect(new URL('/' + token.role.toLowerCase(), req.url));
+      return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
     }
     return null;
   }
@@ -20,17 +20,17 @@ export async function middleware(req: NextRequest) {
   }
 
   // Role-based routing protection
-  if (pathname.startsWith('/admin') && token.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/' + token.role.toLowerCase(), req.url));
+  if (pathname.startsWith('/admin') && (token as any).role !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
   }
   
-  if (pathname.startsWith('/teacher') && token.role !== 'TEACHER' && token.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/' + token.role.toLowerCase(), req.url));
+  if (pathname.startsWith('/teacher') && (token as any).role !== 'TEACHER' && (token as any).role !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
   }
   
-  if (pathname.startsWith('/parent') && token.role !== 'PARENT') {
+  if (pathname.startsWith('/parent') && (token as any).role !== 'PARENT') {
     // Admins might want to test parent view, but strictly adhering to roles:
-    return NextResponse.redirect(new URL('/' + token.role.toLowerCase(), req.url));
+    return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
   }
 
   return NextResponse.next();

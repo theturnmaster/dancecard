@@ -74,7 +74,7 @@ export async function runLottery() {
       if (dancerAssignments[dancer.id].length >= dancer.maxSlotsRequested) continue;
 
       const availableInterests = allInterests
-        .filter(i => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
+        .filter((i: any) => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
 
       if (availableInterests.length > 0) {
         // Sort available interests to maximize chronological distance from already assigned slots
