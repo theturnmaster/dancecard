@@ -47,7 +47,7 @@ export async function runLottery() {
     
     // Get their interests that are still available
     const availableInterests = allInterests
-      .filter((i: any) => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
+      .filter(i => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
 
     if (availableInterests.length > 0) {
       // Pick random one for the first pass
@@ -74,17 +74,17 @@ export async function runLottery() {
       if (dancerAssignments[dancer.id].length >= dancer.maxSlotsRequested) continue;
 
       const availableInterests = allInterests
-        .filter((i: any) => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
+        .filter(i => i.dancerId === dancer.id && !assignedSlotIds.has(i.timeSlotId));
 
       if (availableInterests.length > 0) {
         // Sort available interests to maximize chronological distance from already assigned slots
         // For simplicity in this implementation, we sort by absolute distance to the closest already assigned slot (descending)
-        let sortedInterests = availableInterests.sort((a: any, b: any) => {
+        let sortedInterests = availableInterests.sort((a, b) => {
           const aTime = a.timeSlot.startTime.getTime();
           const bTime = b.timeSlot.startTime.getTime();
           
-          const aMinDist = Math.min(...dancerAssignments[dancer.id].map((s: any) => Math.abs(s.startTime.getTime() - aTime)), Infinity);
-          const bMinDist = Math.min(...dancerAssignments[dancer.id].map((s: any) => Math.abs(s.startTime.getTime() - bTime)), Infinity);
+          const aMinDist = Math.min(...dancerAssignments[dancer.id].map(s => Math.abs(s.startTime.getTime() - aTime)), Infinity);
+          const bMinDist = Math.min(...dancerAssignments[dancer.id].map(s => Math.abs(s.startTime.getTime() - bTime)), Infinity);
           
           return bMinDist - aMinDist; // descending, want largest minimum distance
         });
