@@ -22,6 +22,19 @@ export async function getTeacherSlots(teacherId: string) {
 }
 
 export async function createTeacherSlot(teacherId: string, roomId: string, startTime: Date, endTime: Date) {
+  // Overlap check
+  const existingOverlap = await prisma.timeSlot.findFirst({
+    where: {
+      roomId,
+      startTime: { lt: endTime },
+      endTime: { gt: startTime }
+    }
+  });
+
+  if (existingOverlap) {
+    throw new Error("Overlapping slot: This room is already scheduled for that time block.");
+  }
+
   await prisma.timeSlot.create({
     data: {
       teacherId,

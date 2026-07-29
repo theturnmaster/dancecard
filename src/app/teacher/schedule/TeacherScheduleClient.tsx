@@ -6,36 +6,48 @@ export default function TeacherScheduleClient({
   rooms, 
   slots, 
   onAddSlot, 
-  onUpdateSlot, 
   onDeleteSlot 
 }: any) {
-  const [roomId, setRoomId] = useState(rooms[0]?.id || '');
+  const [activeRoomId, setActiveRoomId] = useState(rooms[0]?.id || '');
+
+  const filteredSlots = slots.filter((s: any) => s.roomId === activeRoomId);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <label className="font-bold text-slate-700">Select Room to Schedule in:</label>
-        <select 
-          className="px-4 py-2 border border-slate-300 rounded-lg bg-white"
-          value={roomId} 
-          onChange={e => setRoomId(e.target.value)}
-        >
-          {rooms.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}
-        </select>
-        {!roomId && <span className="text-red-500 text-sm">No rooms available. Contact Admin.</span>}
+      {/* Room Tabs */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Select Studio Room Tab</label>
+        <div className="flex flex-wrap gap-2">
+          {rooms.map((r: any) => (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => setActiveRoomId(r.id)}
+              className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all shadow-sm ${
+                activeRoomId === r.id
+                  ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-md scale-[1.02]'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📍 {r.name}
+            </button>
+          ))}
+          {rooms.length === 0 && <span className="text-sm font-semibold text-amber-600">No rooms available. Contact Admin to add studio rooms first.</span>}
+        </div>
       </div>
 
+      {/* Calendar for Active Room */}
       <InteractiveCalendar 
-        disabled={!roomId}
-        slots={slots.map((s: any) => ({
+        disabled={!activeRoomId}
+        slots={filteredSlots.map((s: any) => ({
           id: s.id,
           start: new Date(s.startTime),
           end: new Date(s.endTime),
           title: s.room?.name || 'Room',
-          color: s.roomId === roomId ? '#4f46e5' : '#94a3b8'
+          color: '#4f46e5'
         }))}
         onAddSlot={async (start, end) => {
-          if (roomId) await onAddSlot(roomId, start, end);
+          if (activeRoomId) await onAddSlot(activeRoomId, start, end);
         }}
         onDeleteSlot={onDeleteSlot}
       />

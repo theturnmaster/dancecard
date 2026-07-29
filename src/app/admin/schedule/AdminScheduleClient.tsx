@@ -7,29 +7,42 @@ export default function AdminScheduleClient({
   teachers,
   slots, 
   onAddSlot, 
-  onUpdateSlot, 
   onDeleteSlot 
 }: any) {
-  const [roomId, setRoomId] = useState(rooms[0]?.id || '');
+  const [activeRoomId, setActiveRoomId] = useState(rooms[0]?.id || '');
   const [teacherId, setTeacherId] = useState(teachers[0]?.id || '');
+
+  const filteredSlots = slots.filter((s: any) => s.roomId === activeRoomId);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div className="flex items-center gap-3">
-          <label className="font-bold text-slate-700">Scheduling Room:</label>
-          <select 
-            className="px-4 py-2 border border-slate-300 rounded-lg bg-white"
-            value={roomId} 
-            onChange={e => setRoomId(e.target.value)}
-          >
-            {rooms.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}
-          </select>
+      {/* Top Controls: Room Tabs + Teacher Dropdown */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-6">
+        <div>
+          <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Select Studio Room Tab</label>
+          <div className="flex flex-wrap gap-2">
+            {rooms.map((r: any) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setActiveRoomId(r.id)}
+                className={`px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all shadow-sm ${
+                  activeRoomId === r.id
+                    ? 'bg-blue-600 text-white shadow-blue-200 shadow-md scale-[1.02]'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                📍 {r.name}
+              </button>
+            ))}
+            {rooms.length === 0 && <span className="text-sm font-semibold text-rose-600">No rooms available. Create a room on the right first!</span>}
+          </div>
         </div>
+
         <div className="flex items-center gap-3">
-          <label className="font-bold text-slate-700">For Teacher:</label>
+          <label className="font-bold text-slate-800 text-sm">Assigning Teacher:</label>
           <select 
-            className="px-4 py-2 border border-slate-300 rounded-lg bg-white"
+            className="px-4 py-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             value={teacherId} 
             onChange={e => setTeacherId(e.target.value)}
           >
@@ -38,17 +51,18 @@ export default function AdminScheduleClient({
         </div>
       </div>
 
+      {/* Calendar for Active Room */}
       <InteractiveCalendar 
-        disabled={!roomId || !teacherId}
-        slots={slots.map((s: any) => ({
+        disabled={!activeRoomId || !teacherId}
+        slots={filteredSlots.map((s: any) => ({
           id: s.id,
           start: new Date(s.startTime),
           end: new Date(s.endTime),
           title: `${s.teacher?.name || 'Teacher'} (${s.room?.name || 'Room'})`,
-          color: s.teacherId === teacherId ? '#2563eb' : '#94a3b8'
+          color: s.teacherId === teacherId ? '#2563eb' : '#64748b'
         }))}
         onAddSlot={async (start, end) => {
-          if (roomId && teacherId) await onAddSlot(roomId, teacherId, start, end);
+          if (activeRoomId && teacherId) await onAddSlot(activeRoomId, teacherId, start, end);
         }}
         onDeleteSlot={onDeleteSlot}
       />
