@@ -1,6 +1,15 @@
 'use client';
 import { useState } from 'react';
-import InteractiveCalendar from '@/components/InteractiveCalendar';
+import dynamic from 'next/dynamic';
+
+const InteractiveCalendar = dynamic(() => import('@/components/InteractiveCalendar'), {
+  ssr: false,
+  loading: () => (
+    <div className="p-12 text-center text-slate-500 font-semibold bg-white rounded-2xl border border-slate-200">
+      Loading interactive calendar...
+    </div>
+  )
+});
 
 export default function AdminScheduleClient({ 
   rooms, 
