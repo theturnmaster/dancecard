@@ -1,6 +1,6 @@
 'use server';
 
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
 const prisma = new PrismaClient();
@@ -11,7 +11,7 @@ export async function getUsers() {
   });
 }
 
-export async function updateUserRole(userId: string, role: Role) {
+export async function updateUserRole(userId: string, role: any) {
   await prisma.user.update({
     where: { id: userId },
     data: { role }
