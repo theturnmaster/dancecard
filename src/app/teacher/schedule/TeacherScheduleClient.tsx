@@ -1,15 +1,6 @@
 'use client';
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
-
-const InteractiveCalendar = dynamic(() => import('@/components/InteractiveCalendar'), {
-  ssr: false,
-  loading: () => (
-    <div className="p-12 text-center text-slate-500 font-semibold bg-white rounded-2xl border border-slate-200">
-      Loading interactive calendar...
-    </div>
-  )
-});
+import InteractiveCalendar from '@/components/InteractiveCalendar';
 
 export default function TeacherScheduleClient({ 
   rooms, 
@@ -40,14 +31,11 @@ export default function TeacherScheduleClient({
           id: s.id,
           start: new Date(s.startTime),
           end: new Date(s.endTime),
-          title: s.room.name,
-          color: s.roomId === roomId ? '#4f46e5' : '#94a3b8' // Highlight slots for selected room
+          title: s.room?.name || 'Room',
+          color: s.roomId === roomId ? '#4f46e5' : '#94a3b8'
         }))}
         onAddSlot={async (start, end) => {
           if (roomId) await onAddSlot(roomId, start, end);
-        }}
-        onUpdateSlot={async (id, start, end) => {
-          await onUpdateSlot(id, start, end);
         }}
         onDeleteSlot={onDeleteSlot}
       />

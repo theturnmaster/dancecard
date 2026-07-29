@@ -12,7 +12,7 @@ export async function proxy(req: NextRequest) {
     if (token) {
       return NextResponse.redirect(new URL('/' + (token as any).role.toLowerCase(), req.url));
     }
-    return null;
+    return NextResponse.next();
   }
 
   if (!token) {
