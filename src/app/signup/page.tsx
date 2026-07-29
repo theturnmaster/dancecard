@@ -49,7 +49,7 @@ export default function SignupPage() {
               type="text" 
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white text-slate-900"
               required 
             />
           </div>
@@ -59,7 +59,7 @@ export default function SignupPage() {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white text-slate-900"
               required 
             />
           </div>
@@ -69,7 +69,7 @@ export default function SignupPage() {
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all bg-slate-50 focus:bg-white text-slate-900"
               required 
               minLength={6}
             />

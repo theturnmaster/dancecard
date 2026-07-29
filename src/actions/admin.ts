@@ -19,9 +19,20 @@ export async function updateUserRole(userId: string, role: any) {
   revalidatePath('/admin/users');
 }
 
+export async function handleRoleChangeAction(formData: FormData) {
+  const userId = formData.get('userId') as string;
+  const role = formData.get('role') as any;
+  await updateUserRole(userId, role);
+}
+
 export async function deleteUser(userId: string) {
   await prisma.user.delete({ where: { id: userId } });
   revalidatePath('/admin/users');
+}
+
+export async function handleDeleteAction(formData: FormData) {
+  const userId = formData.get('userId') as string;
+  await deleteUser(userId);
 }
 
 export async function getRooms() {
