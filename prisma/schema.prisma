@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  PARENT
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  passwordHash   String
+  resetToken     String?
+  role           Role      @default(PARENT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relationships
+  dancers        Dancer[]  // For Parents
+  taughtSlots    TimeSlot[] // For Teachers
+}
+
+model Dancer {
+  id                  String                 @id @default(cuid())
+  name                String
+  age                 Int?
+  maxSlotsRequested   Int                    @default(1)
+  parentId            String
+  parent              User                   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+
+  interestRegistrations InterestRegistration[]
+  assignments         Assignment[]
+}
+
+model Room {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  timeSlots TimeSlot[]
+}
+
+model TimeSlot {
+  id        String   @id @default(cuid())
+  startTime DateTime
+  endTime   DateTime
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  teacherId String
+  teacher   User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interestRegistrations InterestRegistration[]
+  assignment            Assignment?
+}
+
+model EnrollmentPeriod {
+  id        String   @id @default(cuid())
+  startTime DateTime
+  endTime   DateTime
+  isOpen    Boolean  @default(false)
+}
+
+model InterestRegistration {
+  id         String   @id @default(cuid())
+  dancerId   String
+  dancer     Dancer   @relation(fields: [dancerId], references: [id], onDelete: Cascade)
+  timeSlotId String
+  timeSlot   TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([dancerId, timeSlotId])
+}
+
+model Assignment {
+  id         String   @id @default(cuid())
+  dancerId   String
+  dancer     Dancer   @relation(fields: [dancerId], references: [id], onDelete: Cascade)
+  timeSlotId String   @unique
+  timeSlot   TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}
