@@ -11,25 +11,12 @@ export default async function TeacherSchedulePage() {
     return <div>Unauthorized</div>;
   }
 
+  const teacherId = (session.user as any).id;
+
   const [slots, rooms] = await Promise.all([
-    getTeacherSlots((session.user as any).id),
+    getTeacherSlots(teacherId),
     getRooms()
   ]);
-
-  async function handleAddSlot(roomId: string, start: Date, end: Date) {
-    'use server';
-    await createTeacherSlot((session!.user as any).id, roomId, start, end);
-  }
-
-  async function handleUpdateSlot(slotId: string, start: Date, end: Date) {
-    'use server';
-    await updateTeacherSlot(slotId, (session!.user as any).id, start, end);
-  }
-
-  async function handleDeleteSlot(slotId: string) {
-    'use server';
-    await deleteTeacherSlot(slotId, (session!.user as any).id);
-  }
 
   return (
     <div>
@@ -39,9 +26,9 @@ export default async function TeacherSchedulePage() {
       <TeacherScheduleClient 
         rooms={rooms}
         slots={slots}
-        onAddSlot={handleAddSlot}
-        onUpdateSlot={handleUpdateSlot}
-        onDeleteSlot={handleDeleteSlot}
+        onAddSlot={createTeacherSlot.bind(null, teacherId)}
+        onUpdateSlot={updateTeacherSlot.bind(null, teacherId)}
+        onDeleteSlot={deleteTeacherSlot.bind(null, teacherId)}
       />
     </div>
   );

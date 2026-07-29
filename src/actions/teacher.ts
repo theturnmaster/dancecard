@@ -33,7 +33,7 @@ export async function createTeacherSlot(teacherId: string, roomId: string, start
   revalidatePath('/teacher/schedule');
 }
 
-export async function deleteTeacherSlot(slotId: string, teacherId: string) {
+export async function deleteTeacherSlot(teacherId: string, slotId: string) {
   // Ensure the slot belongs to the teacher before deleting
   await prisma.timeSlot.deleteMany({
     where: {
@@ -44,7 +44,7 @@ export async function deleteTeacherSlot(slotId: string, teacherId: string) {
   revalidatePath('/teacher/schedule');
 }
 
-export async function updateTeacherSlot(slotId: string, teacherId: string, startTime: Date, endTime: Date) {
+export async function updateTeacherSlot(teacherId: string, slotId: string, startTime: Date, endTime: Date) {
   const slot = await prisma.timeSlot.findUnique({ where: { id: slotId }});
   if (slot?.teacherId === teacherId) {
     await prisma.timeSlot.update({

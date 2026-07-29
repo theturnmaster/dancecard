@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { getRooms, createRoom, createTimeSlot, updateTimeSlot } from "@/actions/admin";
+import { getRooms, createRoom, createTimeSlot, updateTimeSlot, deleteTimeSlot } from "@/actions/admin";
 import { getAvailableSlots } from "@/actions/parent"; 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -30,22 +30,6 @@ export default async function AdminSchedulePage() {
     }
   }
 
-  async function handleAddSlot(roomId: string, teacherId: string, start: Date, end: Date) {
-    'use server';
-    await createTimeSlot(roomId, teacherId, start, end);
-  }
-
-  async function handleUpdateSlot(slotId: string, start: Date, end: Date) {
-    'use server';
-    await updateTimeSlot(slotId, start, end);
-  }
-
-  async function handleDeleteSlot(slotId: string) {
-    'use server';
-    await prisma.timeSlot.delete({ where: { id: slotId }});
-    revalidatePath('/admin/schedule');
-  }
-
   return (
     <div>
       <h1 className="text-4xl font-extrabold text-slate-900 mb-6">Manage Schedule</h1>
@@ -57,9 +41,9 @@ export default async function AdminSchedulePage() {
             rooms={rooms}
             teachers={teachers}
             slots={allSlots}
-            onAddSlot={handleAddSlot}
-            onUpdateSlot={handleUpdateSlot}
-            onDeleteSlot={handleDeleteSlot}
+            onAddSlot={createTimeSlot}
+            onUpdateSlot={updateTimeSlot}
+            onDeleteSlot={deleteTimeSlot}
           />
         </div>
         
